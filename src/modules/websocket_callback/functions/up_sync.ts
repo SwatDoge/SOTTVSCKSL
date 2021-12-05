@@ -4,28 +4,28 @@ import tmp from "tmp";
 import path from "path";
 
 export default async function(ws_content: up_sync){    
-    let folder = tmp.dirSync({keep: true});
-    let folder_uri = vscode.Uri.file(folder.name);
+    const folder = tmp.dirSync({keep: true});
+    const folder_uri = vscode.Uri.file(folder.name);
+    const wsedit = new vscode.WorkspaceEdit();
 
-    vscode.workspace.updateWorkspaceFolders(0, 0, {
+    vscode.workspace.updateWorkspaceFolders(0, vscode.workspace.workspaceFolders?.length, {
         uri: vscode.Uri.file(path.join(folder_uri.path)),
         name: "Krunker sync"
     });
 
-    /*["client", "server"].map(type => {
-        let file_uri = vscode.Uri.file(path.join(folder_uri.path, type + ".krnk"));
-        wsedit.createFile(file_uri);
-        vscode.workspace.applyEdit(wsedit);
+    Object.keys(ws_content).filter(x => x !== "type").map(type => {
+        const file_uri: vscode.Uri = vscode.Uri.file(path.join(folder_uri.path, type + ".krnk"));
 
-        if (ws_content.type){
-            vscode.workspace.openTextDocument(file_uri).then(doc => {
-                vscode.window.showTextDocument(doc);
-            });
-            //{content: `# ${type}\n${ws_content[type]}`, language: "krnk"}
-        } else {
-            vscode.window.showErrorMessage(type, "script could not be imported");
-        }
+        wsedit.createFile(file_uri);
+        wsedit.set(file_uri, [vscode.TextEdit.insert(new vscode.Position(0, 0), ws_content[type] ?? "")]);
+        vscode.workspace.applyEdit(wsedit);
     });
-    console.log("a");
-    */
+
+    wsedit.createFile(vscode.Uri.file(path.join(folder_uri.path, ".tmp")));
+    vscode.workspace.applyEdit(wsedit);
+
+    wsedit.createFile(vscode.Uri.file(path.join(folder_uri.path, "libraries/")));
+    vscode.workspace.applyEdit(wsedit);
+
+    vscode.workspace.saveAll();
 }

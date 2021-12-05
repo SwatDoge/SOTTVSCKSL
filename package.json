@@ -7,10 +7,11 @@
 		"vscode": "^1.62.0"
 	},
 	"categories": [
-		"Other"
+		"Programming Languages"
 	],
 	"activationEvents": [
-		"onCommand:krunkscript-linker.connect"
+		"onCommand:krunkscript-linker.connect",
+		"onStartupFinished"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
