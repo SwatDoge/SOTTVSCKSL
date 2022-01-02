@@ -18,7 +18,7 @@
 		"commands": [
 			{
 				"command": "krunkscript-linker.connect",
-				"title": "Connect krunkscript"
+				"title": "create krunkscript connection"
 			}
 		]
 	},
