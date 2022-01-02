@@ -1,6 +1,11 @@
 // ==UserScript==
 // @name         VSCode Krunkerscript link
 // @version      0.1
+// @homepage     https://docs.swatdo.ge/_tampermonkey.html
+// @icon         https://swatdo.ge/images/krunk_sync.png
+// @updateURL    https://github.com/SwatDoge/VSCode-krunkscript-linker/raw/main/tampermonkey/userscript.user.js
+// @downloadURL  https://github.com/SwatDoge/VSCode-krunkscript-linker/raw/main/tampermonkey/userscript.user.js
+// @supportURL   https://discord.gg/bz8abvq
 // @description  Write krunkscript thru vscode.
 // @author       Swat
 // @match        *://krunker.io/editor.html
@@ -8,6 +13,7 @@
 // @grant        unsafeWindow
 // @grant        GM_notification
 // @run-at       document-start
+//
 // @require      https://cdnjs.cloudflare.com/ajax/libs/msgpack-lite/0.1.26/msgpack.min.js
 // ==/UserScript==
 
@@ -41,7 +47,7 @@ GM_addStyle(`
 
 unsafeWindow.onload = function(){
     generate_button();
-}
+};
 
 function generate_button(){
     connect_button = document.createElement("div");
@@ -105,7 +111,7 @@ function establish(){
         switch(ws_content.type){
             case "down_sync":
                 Object.entries(ws_content).map(x => {
-                    if (x[0] != "type" && x[1] != null){
+                    if (x[0] !== "type" && x[1] !== null){
                         unsafeWindow.KE.currentKey = x[0];
                         let page_exists = unsafeWindow.KE.scriptWin.cm[x[0]] && unsafeWindow.KE.scripts[x[0]];
                         if (page_exists){
@@ -114,11 +120,11 @@ function establish(){
                             catch(e){}
                         }
                     }
-                })
-                unsafeWindow.KE.updateScript()
+                });
+                unsafeWindow.KE.updateScript();
                 break;
         }
-    }
+    };
 }
 
 function init(){
@@ -133,9 +139,9 @@ function init(){
                 type: "up_sync",
                 client: unsafeWindow.KE.scriptWin.cm.client.getDoc().getValue(),
                 server: unsafeWindow.KE.scriptWin.cm.server.getDoc().getValue()
-            }
+            };
             socket.send(JSON.stringify(packet));
-        }
+        };
     }
     catch{
         alert("Something went wrong, please retry");
@@ -143,11 +149,11 @@ function init(){
     }
 
     socket.onmessage = (message) => {
-       if (JSON.parse(message.data).type == "restore"){
+       if (JSON.parse(message.data).type === "restore"){
             socket.send(JSON.stringify({type: "restore"}));
             socket.onclose = () => {};
             socket.close();
             reping();
         }
-    }
+    };
 }

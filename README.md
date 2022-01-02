@@ -3,8 +3,8 @@ Swat's over the top krunkscript vscode linker allows you to connect your vscode 
 
 ## How to get set up
 
-1. Install this plugin
-2. Install the [tampermonkey script]()
+1. Install this plugin.
+2. Install the [tampermonkey script](https://github.com/SwatDoge/VSCode-krunkscript-linker/raw/main/tampermonkey/userscript.user.js)
 
 ## Usage
 1. In vscode, hold `ctrl + shift + p`.
