@@ -35,7 +35,7 @@ unsafeWindow.onload = () => {
     let x = 0;
     const observer = new MutationObserver(function(mutations) {
         x++;
-        let el = Array.from(document.getElementById("_toolbar").children).find(x => x.innerText == "Scripting");
+        let el = Array.from(document.getElementById("_toolbar").children).find(x => x.innerText === "Scripting");
         if (el && x > 1){
             el.style.display = "none";
             document.getElementById("_toolbar").style.gridTemplateColumns = "60px 60px 90px 80px 55px 85px 70px 60px 120px 25px";
@@ -49,7 +49,7 @@ unsafeWindow.onload = () => {
         }
     });
     observer.observe(document.getElementById("_toolbar"), {childList: true, subtree: true});
-}
+};
 
 function ping(){
     socket = new WebSocket("ws://localhost:8586");
@@ -70,7 +70,7 @@ function is_established(){
         unsafeWindow.KE.scriptWin.onload = function(){
             unsafeWindow.KE.scriptWin.close();
             socket.send(JSON.stringify({type: "up_sync"}));
-        }
+        };
     }
 
     socket.onmessage = (message) => {
@@ -87,11 +87,11 @@ function is_established(){
                 socket.onclose = ping;
                 break;
         }
-    }
+    };
 
     socket.onclose = () => {
         if (confirm("VSCode disconnected, would you like to keep pinging the server to reconnect?")) {
             ping();
         }
-    }
+    };
 }
