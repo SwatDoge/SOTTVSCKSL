@@ -4,7 +4,7 @@
 	"name": "krunkscript-linker",
 	"displayName": "Krunkscript vscode linker [Beta]",
 	"description": "Link your vscode to krunkscript!",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"publisher": "SwatDoge",
 	"engines": {
 		"vscode": "^1.62.0"
