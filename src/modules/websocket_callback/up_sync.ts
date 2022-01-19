@@ -8,7 +8,7 @@ export default async function(ws_content: up_sync){
     const folder_uri = vscode.Uri.file(folder.name);
     const tmp_file = new vscode.WorkspaceEdit();
 
-    vscode.workspace.updateWorkspaceFolders(0, vscode.workspace.workspaceFolders?.length ?? 0, {
+    vscode.workspace.updateWorkspaceFolders(0, 0, {
         uri: vscode.Uri.file(path.join(folder_uri.path)),
         name: "Krunker sync"
     });
