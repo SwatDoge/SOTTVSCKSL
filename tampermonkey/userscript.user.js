@@ -45,115 +45,121 @@ GM_addStyle(`
 }
 `);
 
-unsafeWindow.onload = function(){
-    generate_button();
-};
+if (unsafeWindow.location.href.includes("krunker.io/editor.html")){
 
-function generate_button(){
-    connect_button = document.createElement("div");
-    connect_button.onclick = ping;
-    connect_button.id = "connect_button";
-    document.getElementById("playbar").appendChild(connect_button);
-}
+    unsafeWindow.onload = function(){
+        generate_button();
+    };
 
-function toggle_button(active){
-    connect_button.onclick = active ? function(){GM_notification("Your are already connected to vscode", "Heads up", "https://swatdo.ge/images/vscode_logo.png", () => {})} : ping;
-    connect_button.style.cursor = active ? "not-allowed" : "pointer";
-    connect_button.style.opacity = active ? 0.25 : 1;
-}
-
-function ping(){
-    toggle_button(true);
-    socket = new WebSocket("ws://localhost:8586");
-    socket.onopen = init;
-    socket.onclose = function() {
-        toggle_button(false);
-        if (confirm("No editor found, want to try again?")) ping();
+    function generate_button(){
+        connect_button = document.createElement("div");
+        connect_button.onclick = ping;
+        connect_button.id = "connect_button";
+        document.getElementById("playbar").appendChild(connect_button);
     }
-    console.log("pinging...");
-}
 
-function reping(){
-    toggle_button(true);
-    socket = new WebSocket("ws://localhost:8586");
-    socket.onopen = establish;
-    socket.onclose = reping;
-    console.log("reping..");
-}
-
-unsafeWindow.WebSocket = class extends unsafeWindow.WebSocket {
-    constructor(...args){
-        super(...args);
-        this.addEventListener("open", event => {
-            let onmessage = this.onmessage;
-            this.onmessage = function(){
-                let ws_message = msgpack.decode(new Uint8Array(arguments[0].data));
-                switch(ws_message[0]){
-                    case "ksC":
-                        if (ws_message[1] != null) socket.send(JSON.stringify({type: "error", message: ws_message[1]}));
-                        else socket.send(JSON.stringify({type: "success"}));
-                        break;
-                }
-                return onmessage.apply(this, arguments);
-            }
-        });
+    function toggle_button(active){
+        connect_button.onclick = active ? function(){GM_notification("Your are already connected to vscode", "Heads up", "https://swatdo.ge/images/vscode_logo.png", () => {})} : ping;
+        connect_button.style.cursor = active ? "not-allowed" : "pointer";
+        connect_button.style.opacity = active ? 0.25 : 1;
     }
-};
 
-function establish(){
-    toggle_button(true);
-    socket.onclose = function(){
-        toggle_button(false);
-        if (confirm("Editor disconnected, want to try again?")) ping();
+    function ping(retry){
+        toggle_button(true);
+        socket = new WebSocket("ws://localhost:8586");
+        socket.onopen = init;
+        socket.onclose = function() {
+            toggle_button(false);
+            if (confirm("No editor found, want to try again?")) ping();
+        }
+        console.log("pinging...");
     }
-    socket.onmessage = (message) => {
-        let ws_content = JSON.parse(message.data);
-        switch(ws_content.type){
-            case "down_sync":
-                Object.entries(ws_content).map(x => {
-                    if (x[0] !== "type" && x[1] !== null){
-                        unsafeWindow.KE.currentKey = x[0];
-                        let page_exists = unsafeWindow.KE.scriptWin.cm[x[0]] && unsafeWindow.KE.scripts[x[0]];
-                        if (page_exists){
-                            unsafeWindow.KE.scripts[x[0]].code = x[1];
-                            try{unsafeWindow.KE.scriptWin.cm[x[0]].setValue(x[1]);}
-                            catch(e){}
+
+    function reping(){
+        toggle_button(true);
+        socket = new WebSocket("ws://localhost:8586");
+        socket.onopen = establish;
+        socket.onclose = reping;
+        console.log("reping..");
+    }
+
+    unsafeWindow.WebSocket = class extends unsafeWindow.WebSocket {
+        constructor(...args){
+            super(...args);
+            this.addEventListener("open", event => {
+                let onmessage = this.onmessage;
+                this.onmessage = function(){
+                    console.log(socket?.readyState === 1);
+                    if (socket?.readyState === 1){
+                        let ws_message = msgpack.decode(new Uint8Array(arguments[0].data));
+                        switch(ws_message[0]){
+                            case "ksC":
+                                if (ws_message[1] != null) socket.send(JSON.stringify({type: "error", message: ws_message[1]}));
+                                else socket.send(JSON.stringify({type: "success"}));
+                                break;
                         }
                     }
-                });
-                unsafeWindow.KE.updateScript();
-                break;
+                    return onmessage.apply(this, arguments);
+                }
+            });
         }
     };
-}
 
-function init(){
-    toggle_button(true);
-    console.info("Server found, please wait...");
-
-    try{
-        unsafeWindow.KE.scriptPopup();
-        unsafeWindow.KE.scriptWin.onload = function(){
-            unsafeWindow.KE.scriptWin.close();
-            let packet = {
-                type: "up_sync",
-                client: unsafeWindow.KE.scriptWin.cm.client.getDoc().getValue(),
-                server: unsafeWindow.KE.scriptWin.cm.server.getDoc().getValue()
-            };
-            socket.send(JSON.stringify(packet));
+    function establish(){
+        toggle_button(true);
+        socket.onclose = function(){
+            toggle_button(false);
+            if (confirm("Editor disconnected, want to try again?")) ping();
+        }
+        socket.onmessage = (message) => {
+            let ws_content = JSON.parse(message.data);
+            switch(ws_content.type){
+                case "down_sync":
+                    Object.entries(ws_content).map(x => {
+                        if (x[0] !== "type" && x[1] !== null){
+                            unsafeWindow.KE.currentKey = x[0];
+                            let page_exists = unsafeWindow.KE.scriptWin.cm[x[0]] && unsafeWindow.KE.scripts[x[0]];
+                            if (page_exists){
+                                unsafeWindow.KE.scripts[x[0]].code = x[1];
+                                try{unsafeWindow.KE.scriptWin.cm[x[0]].setValue(x[1]);}
+                                catch(e){}
+                            }
+                        }
+                    });
+                    unsafeWindow.KE.updateScript();
+                    break;
+            }
         };
     }
-    catch{
-        alert("Something went wrong, please retry");
-        return;
-    }
 
-    socket.onmessage = (message) => {
-       if (JSON.parse(message.data).type === "restore"){
-            socket.send(JSON.stringify({type: "restore"}));
-            socket.onclose = () => {};
-            socket.close();
-            reping();
+    function init(){
+        toggle_button(true);
+        console.info("Server found, please wait...");
+
+        try{
+            unsafeWindow.KE.scriptPopup();
+            unsafeWindow.KE.scriptWin.onload = function(){
+                unsafeWindow.KE.scriptWin.close();
+                let packet = {
+                    type: "up_sync",
+                    client: unsafeWindow.KE.scriptWin.cm.client.getDoc().getValue(),
+                    server: unsafeWindow.KE.scriptWin.cm.server.getDoc().getValue()
+                };
+                socket.send(JSON.stringify(packet));
+            };
         }
-    };
+        catch{
+            alert("Something went wrong, please retry");
+            return;
+        }
+
+        socket.onmessage = (message) => {
+            if (JSON.parse(message.data).type === "restore"){
+                socket.send(JSON.stringify({type: "restore"}));
+                socket.onclose = () => {};
+                socket.close();
+                reping();
+            }
+        };
+    }
 }
