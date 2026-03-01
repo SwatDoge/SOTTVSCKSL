@@ -7,7 +7,7 @@
 // @downloadURL  https://github.com/SwatDoge/VSCode-krunkscript-linker/raw/main/tampermonkey/userscript.user.js
 // @supportURL   https://discord.gg/bz8abvq
 // @description  Write krunkscript thru vscode.
-// @author       Swat
+// @author       Swat, credit to Charly for reviving this
 // @match        *://krunker.io/editor.html
 // @grant        GM_addStyle
 // @grant        unsafeWindow
@@ -24,7 +24,7 @@ let window_open = unsafeWindow.open;
 GM_addStyle(`
 #connect_button{
    transition: filter 200ms;
-   background-image: url(https://swatdo.ge/images/vscode_logo.png);
+   background-image: url(https://swatdoge.eu/images/vscode_logo.svg);
    background-repeat: no-repeat;
    background-size: contain;
    background-position-y: -1px;
@@ -41,7 +41,9 @@ GM_addStyle(`
 }
 
 #playbar{
-   grid-template-columns: 50% 50% 50% 50% !important;
+   grid-template-columns: unset !important;
+   grid-auto-flow: column;
+   grid-auto-columns: 50px;
 }
 `);
 
@@ -59,7 +61,7 @@ if (unsafeWindow.location.href.includes("krunker.io/editor.html")){
     }
 
     function toggle_button(active){
-        connect_button.onclick = active ? function(){GM_notification("Your are already connected to vscode", "Heads up", "https://swatdo.ge/images/vscode_logo.png", () => {})} : ping;
+        connect_button.onclick = active ? function(){GM_notification("Your are already connected to vscode", "Heads up", "https://swatdoge.eu/images/vscode_logo.svg", () => {})} : ping;
         connect_button.style.cursor = active ? "not-allowed" : "pointer";
         connect_button.style.opacity = active ? 0.25 : 1;
     }
